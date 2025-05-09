@@ -1,46 +1,16 @@
 import { Layout, Card, Statistic, List, Typography, Tag } from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
-import { useEffect, useState } from "react";
-import { fetchAssets, fetchCrypto } from "../utils/api";
-import { Spin } from "antd";
-import {percentDifference} from './../utils/PercentUtils';
-
+import { capitalizer } from "../utils/capitalize";
+import { useContext } from "react";
+import {CryptoContext} from "../../context/crypto-context";
 
 const siderStyle = {
     padding: "1rem",
-
 };
 
 const AppSider = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [crypto, setCrypto] = useState([])
-    const [assets, setAssets] = useState([])
+    const { assets } = useContext(CryptoContext);
     
-    useEffect(()=>{
-        async function preload(){
-          setIsLoading(true)
-          const {result} = await fetchCrypto();
-          const assets = await fetchAssets();
-
-          setCrypto(result); 
-          setAssets(assets.map((asset)=> {
-              const coin = result.find(c => c.id === asset.id)
-              return {
-                grow: asset.price < coin.price,
-                growPercent: percentDifference(asset.price, coin.price),
-                totalAmount: asset.amount * coin.price,
-                totalProfit: asset.amount * coin.price - asset.amount * asset.price,
-                ...asset
-              }
-          }));
-          setIsLoading(false);
-        }
-
-        preload() 
-    }, [])
-    
-    if(isLoading === true) return <Spin fullscreen/>
-
     return (
     <Layout.Sider width="25%" style={siderStyle}>
         {assets.map(asset => (
@@ -48,7 +18,7 @@ const AppSider = () => {
             style={{marginBottom: "1rem"}}
           >
             <Statistic
-              title={asset.id}
+              title={capitalizer(asset.id)}
               value={asset.totalAmount}
               precision={2}
               valueStyle={{ color: asset.grow ? '#3f8600' : '#cf1322' }}
@@ -60,7 +30,6 @@ const AppSider = () => {
               dataSource={[
                 {title: 'TotalProfit', value: asset.totalProfit, withTag: true},
                 {title: 'AssetAmount', value: asset.amount, isPlain: true},
-                {title: 'Difference', value: asset.growPercent}
               ]} 
               renderItem={(item) => (
                 <List.Item style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -622,4 +622,10 @@ export const cryptoAssets = [
     price: 2400,
     date: new Date(),
   },
+  {
+    id: 'litecoin',
+    amount: 5,
+    price: 2000,
+    date: new Date(),
+  }
 ]
