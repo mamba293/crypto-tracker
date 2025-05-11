@@ -1,8 +1,8 @@
 import { Layout, Card, Statistic, List, Typography, Tag } from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
-import { capitalizer } from "../utils/capitalize";
+import { capitalizer } from "./../../utils/capitalize";
 import { useContext } from "react";
-import {CryptoContext} from "../../context/crypto-context";
+import { CryptoContext } from "../../context/crypto-context";
 
 const siderStyle = {
     padding: "1rem",
