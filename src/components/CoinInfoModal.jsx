@@ -1,17 +1,10 @@
 import { Flex, Tag, Typography, Divider } from "antd";
+import CoinInfo from "./CoinInfo";
 
 export default function CoinInfoMaodal({ coin }) {
   return (
     <>
-      <Flex align="center">
-        <img src={coin.icon} alt={coin.name} style={{ width: 40 }} />
-        <Typography.Title
-          level={2}
-          style={{ margin: 0, marginRight: 10, marginLeft: 10 }}
-        >
-          ({coin.symbol}) {coin.name}
-        </Typography.Title>
-      </Flex>
+      <CoinInfo coin={coin} withSymbol/>
       <Divider />
       <Typography.Paragraph>
         <Typography.Text strong>1 hour:</Typography.Text>
@@ -45,7 +38,9 @@ export default function CoinInfoMaodal({ coin }) {
       </Typography.Paragraph>
 
       <Typography.Paragraph>
-        <Typography.Text strong>ContractAddress:  {coin.contractAddress}</Typography.Text>
+        <Typography.Text strong>
+          ContractAddress: {coin.contractAddress}
+        </Typography.Text>
       </Typography.Paragraph>
     </>
   );

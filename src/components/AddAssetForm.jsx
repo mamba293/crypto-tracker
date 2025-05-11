@@ -1,16 +1,16 @@
-import { useState} from "react";
+import { useState, useRef } from "react";
 import {
   Select,
   Space,
-  Typography,
   Divider,
-  Flex,
+  Result,
   Form,
   InputNumber,
   Button,
   DatePicker,
 } from "antd";
 import { useCrypto } from "../context/crypto-context";
+import CoinInfo from "./CoinInfo";
 
 const validateMessages = {
   required: "${label} is required!",
@@ -23,24 +23,58 @@ const validateMessages = {
   },
 };
 
-const numberFieldRules = [{ required: true }, { type: "number", min: 0, max: 100000000 }];
+const numberFieldRules = [
+  { required: true },
+  { type: "number", min: 0, max: 100000000 },
+];
 
-export default function AddAssetInfo() {
-  const { crypto } = useCrypto();
+export default function AddAssetInfo({ onClose }) {
+  const { crypto, addAsset } = useCrypto();
   const [coin, setCoin] = useState(null);
   const [form] = Form.useForm();
+  const [submit, setSubmit] = useState(false);
+  const assetRef = useRef()
 
-  function handleAmountChange(value){
-    form.setFieldsValue({
-        total: +(value * form.getFieldValue('price')).toFixed(2)
-    })
+  if (submit) {
+    return (
+      <Result
+        status="success"
+        title="Nes Asset Added"
+        subTitle={`Added ${assetRef.current.amount} of ${coin.name} by price ${assetRef.current.price}`}
+        extra={[
+          <Button type="primary" key="console" onClick={onClose}>
+            Go console
+          </Button>,
+          <Button key="buy">Buy Again</Button>,
+        ]}
+      ></Result>
+    );
   }
 
-  function handlePriceChange(value){
-    const amount = form.getFieldValue('amount')
+  function onFinish(values) {
+    console.log(values);
+    const newAsset={
+      id: coin.id,
+      amount: values.amount,
+      price: values.price,
+      date: values.date?. $d ?? new Date(),
+    };
+    assetRef.current = newAsset;
+    setSubmit(true);
+    addAsset(newAsset)
+  }
+
+  function handleAmountChange(value) {
     form.setFieldsValue({
-        total: +(amount * value).toFixed(2)
-    }) 
+      total: +(value * form.getFieldValue("price")).toFixed(2),
+    });
+  }
+
+  function handlePriceChange(value) {
+    const amount = form.getFieldValue("amount");
+    form.setFieldsValue({
+      total: +(amount * value).toFixed(2),
+    });
   }
 
   if (!coin) {
@@ -68,19 +102,9 @@ export default function AddAssetInfo() {
     );
   }
 
-  function onFinish(values) {
-    console.log(values);
-  }
-
   return (
     <>
-      <Flex align="center">
-        <img src={coin.icon} alt={coin.name} style={{ width: 40 }} />
-        <Typography.Title level={2} style={{ margin: 0, marginLeft: 10 }}>
-          {coin.name}
-        </Typography.Title>
-      </Flex>
-
+      <CoinInfo coin={coin} />
       <Divider />
 
       <Form
@@ -89,9 +113,9 @@ export default function AddAssetInfo() {
         wrapperCol={{ span: 14 }}
         style={{ width: 550 }}
         onFinish={onFinish}
-        validateMessages={validateMessages} 
+        validateMessages={validateMessages}
         initialValues={{
-            price: +(coin.price.toFixed(2))
+          price: +coin.price.toFixed(2),
         }}
       >
         <Form.Item label="Amount" name="amount" rules={numberFieldRules}>
@@ -104,11 +128,7 @@ export default function AddAssetInfo() {
           />
         </Form.Item>
 
-        <Form.Item
-          label="Date & Time"
-          name="date"
-          rules={[{ required: true }]}
-        >
+        <Form.Item label="Date & Time" name="date" rules={[{ required: true }]}>
           <DatePicker showTime />
         </Form.Item>
 
@@ -121,7 +141,7 @@ export default function AddAssetInfo() {
           />
         </Form.Item>
 
-        <Form.Item label="Total"  name="total" rules={numberFieldRules}>
+        <Form.Item label="Total" name="total" rules={numberFieldRules}>
           <InputNumber
             disabled
             size="middle"
@@ -129,8 +149,6 @@ export default function AddAssetInfo() {
             controls={false}
           />
         </Form.Item>
-
-       
 
         <Form.Item>
           <Button type="primary" htmlType="submit">
